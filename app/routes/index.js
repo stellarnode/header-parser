@@ -2,6 +2,7 @@
 
 var path = process.cwd();
 var ClickHandler = require(path + '/app/controllers/clickHandler.server.js');
+var headerParser = require(path + '/app/controllers/headerParser.server.js');
 
 module.exports = function (app, passport) {
 
@@ -16,6 +17,26 @@ module.exports = function (app, passport) {
 	var clickHandler = new ClickHandler();
 
 	app.route('/')
+		.get(function (req, res) {
+			res.sendFile(path + '/public/whoami.html');
+		});
+		
+	app.route('/whoami')
+		.get(function (req, res) {
+			res.sendFile(path + '/public/whoami.html');
+		});
+		
+	app.route(/\/api\/whoami\/?/i)
+		.get(function(req, res) {
+			var out = headerParser(req, res);
+			res.json(out);
+			//res.redirect('/whoami');
+		});
+
+
+// The rest is from the ClementineJS FCC boilerplate...
+
+	app.route('/clementine')
 		.get(isLoggedIn, function (req, res) {
 			res.sendFile(path + '/public/index.html');
 		});
@@ -54,4 +75,5 @@ module.exports = function (app, passport) {
 		.get(isLoggedIn, clickHandler.getClicks)
 		.post(isLoggedIn, clickHandler.addClick)
 		.delete(isLoggedIn, clickHandler.resetClicks);
+		
 };
